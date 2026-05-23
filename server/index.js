@@ -1,6 +1,7 @@
 const express = require("express")
 const http = require("http")
 const cors = require("cors")
+const path = require("path")
 const { Server } = require("socket.io")
 const { v4: uuidv4 } = require("uuid")
 
@@ -11,8 +12,14 @@ const app = express()
 app.use(cors())
 
 const server = http.createServer(app)
-app.get("/", (req, res) => {
-  res.status(200).send("OK")
+
+// 🔥 Serve frontend (IMPORTANT)
+const clientPath = path.join(__dirname, "../client/dist")
+app.use(express.static(clientPath))
+
+// 🔥 Fallback for React routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientPath, "index.html"))
 })
 
 const io = new Server(server, {
@@ -228,6 +235,7 @@ io.on("connection", socket => {
     })
   })
 })
+
 const PORT = process.env.PORT || 3000
 
 server.listen(PORT, "0.0.0.0", () => {
