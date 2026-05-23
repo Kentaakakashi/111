@@ -23,9 +23,13 @@ export default function Lobby() {
         data => {
 
           if (!data.success) {
-            return
-          }
 
+  alert("Room not found or session expired")
+
+  navigate("/")
+
+  return
+          }
           setRoom(data.room)
 
           if (data.role) {
