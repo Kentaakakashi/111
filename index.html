@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Trust Issues</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#09090B;
+    color:white;
+    min-height:100vh;
+    overflow:hidden;
+}
+
+.bg{
+    position:absolute;
+    width:500px;
+    height:500px;
+    background:#8B5CF6;
+    filter:blur(180px);
+    opacity:.25;
+    border-radius:50%;
+    animation:float 8s infinite alternate ease-in-out;
+}
+
+.bg2{
+    right:-100px;
+    bottom:-100px;
+    background:#EF4444;
+}
+
+@keyframes float{
+    from{
+        transform:translateY(0px);
+    }
+    to{
+        transform:translateY(-40px);
+    }
+}
+
+.container{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:450px;
+    background:#18181B;
+    border:1px solid rgba(255,255,255,.08);
+    padding:25px;
+    border-radius:30px;
+    box-shadow:0 0 40px rgba(0,0,0,.4);
+    backdrop-filter:blur(20px);
+}
+
+.title{
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:10px;
+    text-align:center;
+}
+
+.subtitle{
+    text-align:center;
+    opacity:.7;
+    margin-bottom:30px;
+}
+
+input{
+    width:100%;
+    padding:16px;
+    border:none;
+    outline:none;
+    background:#27272A;
+    color:white;
+    border-radius:16px;
+    margin-bottom:15px;
+    font-size:1rem;
+}
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:16px;
+    cursor:pointer;
+    font-size:1rem;
+    font-weight:bold;
+    transition:.2s;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+.primary{
+    background:#8B5CF6;
+    color:white;
+}
+
+.secondary{
+    background:#27272A;
+    color:white;
+    margin-top:10px;
+}
+
+.room{
+    margin-top:20px;
+    text-align:center;
+    font-size:1.2rem;
+    opacity:.8;
+}
+
+.players{
+    margin-top:20px;
+}
+
+.player{
+    background:#27272A;
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:10px;
+}
+
+.hidden{
+    display:none;
+}
+
+.roleBox{
+    margin-top:20px;
+    background:#27272A;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+}
+
+.roleTitle{
+    opacity:.6;
+    margin-bottom:10px;
+}
+
+.roleWord{
+    font-size:2.5rem;
+    font-weight:900;
+}
+
+.voteBtn{
+    margin-top:10px;
+    background:#EF4444;
+}
+
+.result{
+    margin-top:20px;
+    text-align:center;
+    font-size:1.2rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="bg bg2"></div>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="title">TRUST ISSUES</div>
+        <div class="subtitle">Find the fake. Or become it.</div>
+
+        <div id="setup">
+
+            <input id="username" placeholder="Username">
+
+            <button class="primary" onclick="joinGame()">
+                JOIN GAME
+            </button>
+
+        </div>
+
+        <div id="game" class="hidden">
+
+            <div class="room">
+                Room: DISCORD VC 💀
+            </div>
+
+            <div class="players" id="players"></div>
+
+            <button class="primary" onclick="startGame()">
+                START GAME
+            </button>
+
+            <div id="roleArea" class="hidden">
+
+                <div class="roleBox">
+                    <div class="roleTitle">YOUR WORD</div>
+                    <div class="roleWord" id="roleWord"></div>
+                </div>
+
+                <button class="voteBtn" onclick="voteRandom()">
+                    VOTE SOMEONE 😭
+                </button>
+
+                <div class="result" id="result"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let players = []
+let currentUser = ""
+let impostor = ""
+let words = [
+    ["Pizza","Burger"],
+    ["Tiger","Lion"],
+    ["Beach","Desert"],
+    ["Apple","Tomato"],
+    ["Coffee","Tea"]
+]
+
+function joinGame(){
+
+    const username = document.getElementById("username").value.trim()
+
+    if(!username) return
+
+    currentUser = username
+
+    players.push(username)
+
+    updatePlayers()
+
+    document.getElementById("setup").classList.add("hidden")
+    document.getElementById("game").classList.remove("hidden")
+
+}
+
+function updatePlayers(){
+
+    const container = document.getElementById("players")
+
+    container.innerHTML = ""
+
+    players.forEach(player=>{
+
+        container.innerHTML += `
+            <div class="player">${player}</div>
+        `
+
+    })
+
+}
+
+function startGame(){
+
+    if(players.length < 1){
+        alert("Need players bro")
+        return
+    }
+
+    const pair = words[Math.floor(Math.random()*words.length)]
+
+    const realWord = pair[0]
+    const fakeWord = pair[1]
+
+    impostor = players[Math.floor(Math.random()*players.length)]
+
+    let myWord = currentUser === impostor
+        ? fakeWord
+        : realWord
+
+    document.getElementById("roleArea").classList.remove("hidden")
+
+    document.getElementById("roleWord").innerText = myWord
+
+    navigator.vibrate?.(200)
+
+}
+
+function voteRandom(){
+
+    const others = players.filter(p=>p!==currentUser)
+
+    if(others.length===0){
+        alert("No players to vote 😭")
+        return
+    }
+
+    const voted = others[Math.floor(Math.random()*others.length)]
+
+    document.getElementById("result").innerHTML = `
+        You voted <b>${voted}</b><br><br>
+        Impostor was <b>${impostor}</b> 💀
+    `
+
+}
+
+</script>
+
+</body>
+              </html>
