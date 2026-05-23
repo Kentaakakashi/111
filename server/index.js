@@ -11,6 +11,9 @@ const app = express()
 app.use(cors())
 
 const server = http.createServer(app)
+app.get("/", (req, res) => {
+  res.status(200).send("OK")
+})
 
 const io = new Server(server, {
   cors: {
@@ -225,11 +228,6 @@ io.on("connection", socket => {
     })
   })
 })
-
-app.get("/", (req, res) => {
-  res.send("Trust Issues backend running")
-})
-
 const PORT = process.env.PORT || 3000
 
 server.listen(PORT, "0.0.0.0", () => {
