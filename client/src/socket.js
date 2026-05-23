@@ -1,27 +1,18 @@
 import { io } from "socket.io-client"
 
-// 🔥 Automatically pick correct backend URL
-const URL =
-  import.meta.env.VITE_SERVER_URL || "http://localhost:3000"
+// 🔥 HARDCODED Railway URL (no env issues)
+const URL = "https://111-production-ccbe.up.railway.app"
 
-// 🔌 Create socket connection
 export const socket = io(URL, {
-  transports: ["websocket"], // ensures Railway works reliably
-  autoConnect: true,
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000
+  transports: ["websocket"],
+  secure: true
 })
 
-// 🧠 Debug logs (VERY useful)
+// 🔥 MOBILE DEBUG (you NEED this)
 socket.on("connect", () => {
-  console.log("✅ Connected to server:", socket.id)
-})
-
-socket.on("disconnect", (reason) => {
-  console.log("❌ Disconnected:", reason)
+  alert("✅ Connected to server")
 })
 
 socket.on("connect_error", (err) => {
-  console.error("🚨 Connection Error:", err.message)
+  alert("❌ Connection failed: " + err.message)
 })
