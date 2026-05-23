@@ -12,26 +12,34 @@ export default function Lobby() {
 
   useEffect(() => {
 
-    socket.emit(
-      "reconnect_player",
-      {
-        roomCode,
-        sessionId: localStorage.getItem("sessionId")
-      },
-      data => {
+    function reconnect() {
 
-        if (!data.success) {
-          navigate("/")
-          return
+      socket.emit(
+        "reconnect_player",
+        {
+          roomCode,
+          sessionId: localStorage.getItem("sessionId")
+        },
+        data => {
+
+          if (!data.success) {
+            return
+          }
+
+          setRoom(data.room)
+
+          if (data.role) {
+            navigate("/role")
+          }
         }
+      )
+    }
 
-        setRoom(data.room)
+    if (socket.connected) {
+      reconnect()
+    }
 
-        if (data.role) {
-          navigate("/role")
-        }
-      }
-    )
+    socket.on("connect", reconnect)
 
     socket.on("room_update", room => {
       setRoom(room)
@@ -42,6 +50,7 @@ export default function Lobby() {
     })
 
     return () => {
+      socket.off("connect", reconnect)
       socket.off("room_update")
       socket.off("game_started")
     }
